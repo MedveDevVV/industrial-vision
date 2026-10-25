@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="960" viewBox="0 0 1200 960">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#374151"/>
+    </marker>
+    <marker id="darrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6B7280"/>
+    </marker>
+    <style>
+      .node { fill:#F8FAFC; stroke:#334155; stroke-width:2; rx:14; }
+      .support { fill:#F3F4F6; stroke:#6B7280; stroke-width:2; rx:14; }
+      .title { font: bold 22px Arial, sans-serif; fill:#111827; text-anchor:middle; }
+      .sub { font: 16px Arial, sans-serif; fill:#374151; text-anchor:middle; }
+      .edge { stroke:#374151; stroke-width:2.5; fill:none; marker-end:url(#arrow); }
+      .dashed { stroke:#6B7280; stroke-width:2; fill:none; stroke-dasharray:7 6; marker-end:url(#darrow); }
+      .caption { font: 14px Arial, sans-serif; fill:#6B7280; }
+      .heading { font:bold 28px Arial, sans-serif; fill:#111827; text-anchor:middle; }
+    </style>
+  </defs>
+  <rect width="1200" height="960" fill="#FFFFFF"/>
+  <text x="600" y="45" class="heading">Industrial Vision — архитектура обработки видеопотока</text>
+
+  <rect x="400" y="75" width="400" height="68" class="node"/>
+  <text x="600" y="103" class="title">Источник видеопотока</text>
+  <text x="600" y="126" class="sub">Камера или видеофайл</text>
+
+  <path d="M600 143 V170" class="edge"/>
+  <rect x="400" y="170" width="400" height="68" class="node"/>
+  <text x="600" y="198" class="title">Capture</text>
+  <text x="600" y="221" class="sub">Получение кадров</text>
+
+  <path d="M600 238 V265" class="edge"/>
+  <rect x="400" y="265" width="400" height="68" class="node"/>
+  <text x="600" y="293" class="title">Inference</text>
+  <text x="600" y="316" class="sub">Обнаружение объектов моделью</text>
+
+  <path d="M600 333 V360" class="edge"/>
+  <rect x="400" y="360" width="400" height="68" class="node"/>
+  <text x="600" y="388" class="title">Tracking</text>
+  <text x="600" y="411" class="sub">Отслеживание объектов между кадрами</text>
+
+  <path d="M600 428 V455" class="edge"/>
+  <rect x="400" y="455" width="400" height="68" class="node"/>
+  <text x="600" y="483" class="title">Zones</text>
+  <text x="600" y="506" class="sub">Проверка положения объектов в зонах</text>
+
+  <path d="M600 523 V550" class="edge"/>
+  <rect x="400" y="550" width="400" height="68" class="node"/>
+  <text x="600" y="578" class="title">Analytics</text>
+  <text x="600" y="601" class="sub">Расчёт статистики и показателей</text>
+
+  <path d="M600 618 V645" class="edge"/>
+  <rect x="400" y="645" width="400" height="68" class="node"/>
+  <text x="600" y="673" class="title">Events</text>
+  <text x="600" y="696" class="sub">Формирование событий</text>
+
+  <path d="M600 713 V740" class="edge"/>
+  <rect x="400" y="740" width="400" height="68" class="node"/>
+  <text x="600" y="768" class="title">API</text>
+  <text x="600" y="791" class="sub">Передача результатов другим компонентам</text>
+
+  <rect x="35" y="280" width="250" height="90" class="support"/>
+  <text x="160" y="313" class="title">configs/</text>
+  <text x="160" y="339" class="sub">Настройки приложения</text>
+  <path d="M285 325 H345 V204 H400" class="dashed"/>
+  <path d="M345 299 H400" class="dashed"/>
+  <path d="M345 299 V489 H400" class="dashed"/>
+  <text x="300" y="285" class="caption">настройки</text>
+
+  <rect x="875" y="300" width="285" height="90" class="support"/>
+  <text x="1017" y="333" class="title">Logging</text>
+  <text x="1017" y="359" class="sub">Журналы работы и ошибок</text>
+  <path d="M800 299 H845 V345 H875" class="dashed"/>
+  <path d="M800 394 H845 V345" class="dashed"/>
+  <text x="846" y="285" class="caption" text-anchor="middle">события / ошибки</text>
+
+  <rect x="875" y="590" width="285" height="90" class="support"/>
+  <text x="1017" y="623" class="title">Monitoring</text>
+  <text x="1017" y="649" class="sub">Состояние и производительность</text>
+  <path d="M800 299 H850 V635 H875" class="dashed"/>
+  <path d="M800 774 H850 V635" class="dashed"/>
+  <text x="858" y="570" class="caption" text-anchor="middle">метрики</text>
+
+  <text x="600" y="870" class="sub">Сплошные стрелки — основной поток обработки</text>
+  <text x="600" y="897" class="sub">Пунктирные стрелки — конфигурация и вспомогательные связи</text>
+  <text x="600" y="932" class="caption" text-anchor="middle">Предварительная архитектура; детали будут уточняться при реализации.</text>
+</svg>

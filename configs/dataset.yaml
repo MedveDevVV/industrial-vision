@@ -1,0 +1,5 @@
+# Пути к набору данных
+dataset:
+  train: "../datasets/train"
+  val: "../datasets/val"
+  test: "../datasets/test"

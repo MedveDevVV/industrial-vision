@@ -1,0 +1,8 @@
+# Общие настройки приложения
+app:
+  name: "Industrial Vision"
+  log_level: "INFO"
+
+# Источник видеопотока
+video:
+  source: 0
