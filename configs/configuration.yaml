@@ -1,8 +1,15 @@
-# Общие настройки приложения
 app:
   name: "Industrial Vision"
   log_level: "INFO"
 
-# Источник видеопотока
 video:
   source: 0
+  reconnect_sec: 2.0
+  max_attempts: 5
+
+model:
+  path: "yolo11n.pt"
+  confidence: 0.5
+
+inference:
+  update_interval_ms: 200

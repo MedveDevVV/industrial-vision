@@ -13,3 +13,4 @@ htmlcov/
 *.onnx
 *.pth
 *.weights
+*.log

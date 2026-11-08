@@ -2,10 +2,13 @@ import cv2
 import time
 import argparse
 
+from src.config import load_config
+
 from src.capture.video_capture import VideoSource
 from src.capture.frame_buffer import FrameBuffer
 from src.capture.capture_worker import CaptureWorker
 from src.capture.fps_meter import FPSMeter
+from src.logger import setup_logger
 
 from src.inference.detector import Detector
 
@@ -15,22 +18,50 @@ from src.visualization.drawing import (
 )
 
 
-MODEL_PATH = "yolo11n.pt"
-
-
 def main():
+    config = load_config()
+    logger = setup_logger(
+        config["app"]["log_level"]
+    )
     args = parse_arguments()
 
-    video = VideoSource(args.source)
+    # Настройки приложения.
+    app_config = config["app"]
+    video_config = config["video"]
+    model_config = config["model"]
+    inference_config = config["inference"]
+
+    # Аргументы командной строки имеют приоритет над YAML.
+    source = (
+        args.source
+        if args.source is not None
+        else video_config["source"]
+    )
+
+    update_interval = (
+        args.update_interval
+        if args.update_interval is not None
+        else inference_config["update_interval_ms"]
+    )
+
+    update_interval /= 1000.0
+
+    logger.info(f"Запуск приложения: {app_config['name']}")
+    logger.info(f"Источник видео: {source}")
+
+    video = VideoSource(
+        source,
+        reconnect_sec=video_config["reconnect_sec"],
+        max_attempts=video_config["max_attempts"]
+    )
+
     frame_buffer = FrameBuffer()
 
-    update_interval = args.update_interval / 1000.0
-
     try:
-        detector = Detector(MODEL_PATH, confidence=0.5)
+        detector = Detector(model_config["path"], confidence=model_config["confidence"])
         print("Модель YOLO успешно загружена.")
-    except Exception as error:
-        print(f"Ошибка загрузки модели YOLO: {error}")
+    except Exception:
+        logger.exception("Ошибка загрузки модели YOLO")
         return
 
     fps_meter = FPSMeter()
@@ -52,9 +83,9 @@ def main():
 
             # Проверяем наличие нового кадра и интервал обработки.
             if (
-                frame is not None
-                and frame_id != last_processed_frame_id
-                and current_time >= next_update_time
+                    frame is not None
+                    and frame_id != last_processed_frame_id
+                    and current_time >= next_update_time
             ):
                 actual_frame = frame.copy()
 
@@ -83,7 +114,7 @@ def main():
 
             # Проверяем ошибки захвата.
             if capture_worker.error is not None:
-                print(f"Ошибка видеозахвата: {capture_worker.error}")
+                logger.error(f"Ошибка видеозахвата: {capture_worker.error}")
                 break
 
             # Проверяем завершение видеопотока.
@@ -99,7 +130,7 @@ def main():
         capture_worker.join()
 
         cv2.destroyAllWindows()
-        print("Видеозахват остановлен.")
+        logger.info("Видеозахват остановлен.")
 
 
 def parse_source(value: str) -> str | int:
