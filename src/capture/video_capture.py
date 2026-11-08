@@ -3,13 +3,21 @@ import time as time_module
 import cv2
 import numpy as np
 
-# Управление одним источником видеопотока
+
 class VideoSource:
-    def __init__(self, source: str | int, reconnect_sec: float = 2.0, max_attempts: int = 5):
+    def __init__(
+        self,
+        source: str | int,
+        reconnect_sec: float = 2.0,
+        max_attempts: int = 5
+    ):
         self.source = source
+        self.is_file = isinstance(source, str)
         self.reconnect_sec = reconnect_sec
         self.max_attempts = max_attempts
-        self.cap: cv2.VideoCapture | None = None # Поле хранящее объект OpenCV, управляющий открытым видеоисточником
+
+        self.cap: cv2.VideoCapture | None = None
+        self.fps = 0.0
 
     def open(self) -> None:
         if self.cap is not None:
@@ -20,10 +28,14 @@ class VideoSource:
         if not self.cap.isOpened():
             self.cap.release()
             self.cap = None
-            raise RuntimeError(f"Could not open video source {self.source}")
+            raise RuntimeError(
+                f"Could not open video source {self.source}"
+            )
 
+        if self.is_file:
+            self.fps = self.cap.get(cv2.CAP_PROP_FPS)
 
-    def read(self) -> np.ndarray:
+    def read(self) -> np.ndarray | None:
         for attempt in range(1, self.max_attempts + 1):
             try:
                 if self.cap is None or not self.cap.isOpened():
@@ -37,15 +49,19 @@ class VideoSource:
                 if ok and frame is not None:
                     return frame
 
+                if self.is_file:
+                    return None
+
                 raise RuntimeError("Failed to receive video frame")
 
             except RuntimeError as error:
                 self.close()
 
                 if attempt == self.max_attempts:
-                    raise RuntimeError(f"Video source unavailable after "
-                                       f"{self.max_attempts} attempts"
-                                       ) from error
+                    raise RuntimeError(
+                        f"Video source unavailable after "
+                        f"{self.max_attempts} attempts"
+                    ) from error
 
                 print(
                     f"Video source unavailable. "
@@ -54,7 +70,6 @@ class VideoSource:
                 )
 
                 time_module.sleep(self.reconnect_sec)
-
 
     def close(self) -> None:
         if self.cap is not None:
