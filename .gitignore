@@ -9,7 +9,6 @@ __pycache__/
 .coverage
 htmlcov/
 *.log
-*.pt
 *.onnx
 *.pth
 *.weights

@@ -1,3 +1,4 @@
+from pathlib import Path
 from ultralytics import YOLO
 
 from .types import Detection
@@ -5,7 +6,18 @@ from .types import Detection
 
 class Detector:
     def __init__(self, model_path: str, confidence: float = 0.5):
-        self.model = YOLO(model_path)
+        project_root = Path(__file__).resolve().parents[2]
+        model_file = Path(model_path)
+
+        if not model_file.is_absolute():
+            model_file = project_root / model_file
+
+        if not model_file.is_file():
+            raise FileNotFoundError(
+                f"Файл модели не найден: {model_file}"
+            )
+
+        self.model = YOLO(str(model_file))
         self.confidence = confidence
 
     def predict(self, frame) -> list[Detection]:

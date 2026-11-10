@@ -8,7 +8,7 @@ video:
   max_attempts: 5
 
 model:
-  path: "yolo11n.pt"
+  path: "models/person/yolo11n.pt"
   confidence: 0.5
 
 inference:
