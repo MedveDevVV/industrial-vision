@@ -5,8 +5,27 @@ from .types import Detection
 
 
 class Detector:
-    def __init__(self, model_path: str, confidence: float = 0.3):
+    def __init__(
+            self,
+            model_path: str,
+            confidence: float = 0.3,
+            tracker_type: str = "botsort"
+    ):
         project_root = Path(__file__).resolve().parents[2]
+
+        tracker_configs = {"bytetrack": "bytetrack.yaml", "botsort": "botsort.yaml" }
+        if tracker_type not in tracker_configs:
+            raise ValueError(
+                f"Неизвестный трекер: {tracker_type}. "
+                f"Доступны: {', '.join(tracker_configs)}"
+            )
+        self.tracker_config = (project_root/ "configs"/ "trackers"/ tracker_configs[tracker_type])
+
+        if not self.tracker_config.is_file():
+            raise FileNotFoundError(
+                f"Файл конфигурации трекера не найден: {self.tracker_config}"
+            )
+
         model_file = Path(model_path)
 
         if not model_file.is_absolute():
@@ -26,7 +45,7 @@ class Detector:
             conf=self.confidence,
             classes=[0],
             persist=True,               # сохранение состояния трека между кадрами
-            tracker="bytetrack.yaml",
+            tracker=str(self.tracker_config),
             verbose=False
         )[0]
 

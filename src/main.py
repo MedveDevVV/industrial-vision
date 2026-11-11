@@ -65,7 +65,11 @@ def main():
     frame_buffer = FrameBuffer()
 
     try:
-        detector = Detector(model_config["path"], confidence=model_config["confidence"])
+        detector = Detector(
+            model_path=config["model"]["path"],
+            confidence=config["model"]["confidence"],
+            tracker_type=config["tracking"]["tracker"]
+        )
         print("Модель YOLO успешно загружена.")
     except Exception:
         logger.exception("Ошибка загрузки модели YOLO")
@@ -73,7 +77,7 @@ def main():
 
     fps_meter = FPSMeter()
     capture_worker = CaptureWorker(video, frame_buffer)
-    event_engine = EventEngine(confirmation_frames=3)
+    event_engine = EventEngine(confirmation_frames=7)
 
     actual_frame = None
     last_processed_frame_id = -1
