@@ -1,20 +1,31 @@
 import cv2
+import numpy as np
 
 from src.inference.types import Detection
 
 
 def draw_detections(frame, detections: list[Detection]):
     for detection in detections:
+        color = (0, 0, 255) if detection.in_roi else (0, 255, 0)
+
         cv2.rectangle(
             frame,
             (detection.x1, detection.y1),
             (detection.x2, detection.y2),
-            (0, 255, 0),
+            color,
             2
         )
 
+        point = (
+            (detection.x1 + detection.x2) // 2,
+            detection.y2
+        )
+
+        cv2.circle(frame, point, 5, color, -1)
+
         label = (
             f"{detection.class_name}: "
+            f"ID:{detection.track_id} "
             f"{detection.confidence:.2f}"
         )
 
@@ -24,7 +35,7 @@ def draw_detections(frame, detections: list[Detection]):
             (detection.x1, detection.y1 - 10),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.6,
-            (0, 255, 0),
+            color,
             2
         )
 
@@ -54,6 +65,19 @@ def draw_metrics(
         0.8,
         (0, 255, 0),
         2
+    )
+
+    return frame
+
+def draw_roi(frame, polygon: list[tuple[int, int]]):
+    points = np.array(polygon, dtype=np.int32)
+
+    cv2.polylines(
+        frame,
+        [points],
+        isClosed=True,
+        color=(0, 0, 255),
+        thickness=2
     )
 
     return frame

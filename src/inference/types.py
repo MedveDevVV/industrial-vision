@@ -10,3 +10,5 @@ class Detection:
     y1: int
     x2: int
     y2: int
+    track_id: int | None = None
+    in_roi: bool = False

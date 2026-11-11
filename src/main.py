@@ -9,12 +9,18 @@ from src.capture.frame_buffer import FrameBuffer
 from src.capture.capture_worker import CaptureWorker
 from src.capture.fps_meter import FPSMeter
 from src.logger import setup_logger
+from src.analytics.event_engine import EventEngine
 
 from src.inference.detector import Detector
 
 from src.visualization.drawing import (
     draw_detections,
-    draw_metrics
+    draw_metrics,
+    draw_roi
+)
+from src.analytics.roi import (
+    normalized_polygon_to_pixels,
+    is_inside_roi
 )
 
 
@@ -30,6 +36,7 @@ def main():
     video_config = config["video"]
     model_config = config["model"]
     inference_config = config["inference"]
+    roi_config = config["roi"]
 
     # Аргументы командной строки имеют приоритет над YAML.
     source = (
@@ -66,6 +73,7 @@ def main():
 
     fps_meter = FPSMeter()
     capture_worker = CaptureWorker(video, frame_buffer)
+    event_engine = EventEngine(confirmation_frames=3)
 
     actual_frame = None
     last_processed_frame_id = -1
@@ -91,6 +99,35 @@ def main():
 
                 # Распознаём объекты.
                 detections = detector.predict(actual_frame)
+
+                # Переводим координаты ROI в пиксели кадра.
+                if roi_config["enabled"]:
+                    height, width = actual_frame.shape[:2]
+
+                    roi_polygon = normalized_polygon_to_pixels(
+                        roi_config["points"],
+                        width,
+                        height
+                    )
+
+                    # Проверяем положение каждого человека.
+                    for detection in detections:
+                        detection.in_roi = is_inside_roi(
+                            detection,
+                            roi_polygon
+                        )
+
+                    draw_roi(actual_frame, roi_polygon)
+
+                    # Проверяем условия возникновения событий.
+                    events = event_engine.update(detections)
+
+                    # Регистрируем подтверждённые нарушения.
+                    for track_id in events:
+                        logger.warning(
+                            f"Нарушение: человек с Track ID {track_id} "
+                            f"находится в запретной зоне."
+                        )
 
                 # Отрисовываем результаты распознавания.
                 draw_detections(actual_frame, detections)
