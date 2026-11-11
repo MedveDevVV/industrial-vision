@@ -15,7 +15,7 @@ inference:
   update_interval_ms: 200
   
 roi:
-  enabled: true
+  enabled: false
   points:
     - [0.50, 0.86]
     - [0.73, 0.86]
@@ -24,3 +24,10 @@ roi:
 
 tracking:
   tracker: bytetrack
+
+ppe:
+  enabled: true
+  model_path: "models/ppe/ppe_yolo11n_best.pt"
+  confidence: 0.25
+  min_person_height: 120
+  confirmation_frames: 3
